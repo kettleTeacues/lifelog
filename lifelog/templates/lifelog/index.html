@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <div class="welcome">
+        <h1 class="title">ようこそlifelogへ！</h1>
+        <p class="subtitle">あなたの生活を記録しましょう</p>
+    </div>
+
+    {% if lifelog %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>日時</th>
+                <th>イベント</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in lifelog %}
+            <tr>
+                <th>{{ log.date }}</th>
+                <th>{{ log.event }}</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>no lifelog posted</p>
+    {% endif %}
+{% endblock %}

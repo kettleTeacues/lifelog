@@ -1,3 +1,4 @@
 from django.contrib import admin
+from lifelog.models import Lifelog
 
-# Register your models here.
+admin.site.register(Lifelog)
