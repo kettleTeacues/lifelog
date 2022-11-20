@@ -1,10 +1,11 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_safe
 
 from lifelog.models import Lifelog
 
-@require_safe
+@login_required
 def index(request):
-    lifelog = Lifelog.objects.all()
+    lifelog = Lifelog.objects.filter(created_by=request.user.id)
     context = {'lifelog': lifelog}
     return render(request, 'lifelog/index.html', context)
