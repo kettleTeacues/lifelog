@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <div class="welcome">
+        <h1 class="title">ようこそlifelogへ！</h1>
+        <p class="subtitle">あなたの生活を記録しましょう</p>
+    </div>
+
+    {% if lifelog %}
+    {% else %}
+    <p>スニペットはまだ投稿されていません。</p>
+    {% endif %}
+{% endblock %}
