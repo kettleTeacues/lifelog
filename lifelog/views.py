@@ -6,6 +6,6 @@ from lifelog.models import Lifelog
 
 @login_required
 def index(request):
-    lifelog = Lifelog.objects.filter(created_by=request.user.id)
+    lifelog = Lifelog.objects.order_by('-staDate').filter(created_by=request.user.id)
     context = {'lifelog': lifelog}
     return render(request, 'lifelog/index.html', context)
