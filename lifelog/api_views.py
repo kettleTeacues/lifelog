@@ -8,8 +8,8 @@ class LifelogViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = (
         'id',
-        'date',
+        'staDate',
     )
     ordering = (
-        'date'
+        'staDate'
     )
