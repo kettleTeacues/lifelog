@@ -10,14 +10,16 @@
     <table class="table">
         <thead>
             <tr>
-                <th>日時</th>
+                <th>開始日時</th>
+                <th>終了日時</th>
                 <th>イベント</th>
             </tr>
         </thead>
         <tbody>
             {% for log in lifelog %}
             <tr>
-                <th>{{ log.date }}</th>
+                <th>{{ log.staDate }}</th>
+                <th>{{ log.endDate }}</th>
                 <th>{{ log.event }}</th>
             </tr>
             {% endfor %}
