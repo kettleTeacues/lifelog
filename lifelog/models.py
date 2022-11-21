@@ -3,7 +3,8 @@ from django.conf import settings
 from django.utils import timezone
 
 class Lifelog(models.Model):
-    date = models.DateTimeField(default=timezone.now)
+    staDate = models.DateTimeField(null = True)
+    endDate = models.DateTimeField(null = True)
     event = models.CharField(blank=True, null=True, max_length=100)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
