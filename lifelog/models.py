@@ -25,4 +25,4 @@ class Lifelog(models.Model):
         ]
 
     def __str__(self):
-        return self.created_by, self.event, format(self.staDate, '%Y-%m-%d %H-%M-%S')
+        return str(self.created_by)+' '+self.event+' '+format(self.staDate, '%Y-%m-%d %H-%M-%S')
