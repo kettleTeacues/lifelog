@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
+import datetime
+
 class Lifelog(models.Model):
     staDate = models.DateTimeField(null = True)
     endDate = models.DateTimeField(null = True)
@@ -13,3 +15,14 @@ class Lifelog(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['staDate', 'endDate', 'event', 'created_by'],
+                name='unique_log'
+            )
+        ]
+
+    def __str__(self):
+        return self.created_by, self.event, format(self.staDate, '%Y-%m-%d %H-%M-%S')

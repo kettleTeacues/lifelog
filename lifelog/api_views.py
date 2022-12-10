@@ -11,5 +11,5 @@ class LifelogViewSet(viewsets.ModelViewSet):
         'staDate',
     )
     ordering = (
-        'staDate'
+        'endDate'
     )
