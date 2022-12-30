@@ -8,6 +8,8 @@
         {% bootstrap_css %}
         {% bootstrap_javascript %}
         <link rel="stylesheet" href="{% static 'lifelog/css/style.css' %}">
+        <link rel="stylesheet" href="https://unpkg.com/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.css">
         {% block extraheader %}{% endblock %}
     </head>
     <body>
@@ -35,5 +37,13 @@
                 {% block main %}{% endblock %}
             </div>
         </main>
+        
+        <!-- Vue & BootstrapVue -->
+        <script src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.min.js"></script>
+        <script src="https://unpkg.com/vue@2.6.12/dist/vue.min.js"></script>
+        <script src="https://unpkg.com/bootstrap-vue@2.21.2/dist/bootstrap-vue.min.js"></script>
+
+        <!-- axios -->
+        <script src="https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
     </body>
 </html>
