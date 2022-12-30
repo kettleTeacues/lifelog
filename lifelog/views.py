@@ -9,3 +9,7 @@ def index(request):
     lifelog = Lifelog.objects.order_by('-staDate').filter(created_by=request.user.id)
     context = {'lifelog': lifelog}
     return render(request, 'lifelog/index.html', context)
+
+@login_required
+def control(request):
+    return render(request, 'lifelog/control.html')
