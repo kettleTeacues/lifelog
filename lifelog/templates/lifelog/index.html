@@ -6,26 +6,34 @@
         <p class="subtitle">あなたの生活を記録しましょう</p>
     </div>
 
-    {% if lifelog %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>開始日時</th>
-                <th>終了日時</th>
-                <th>イベント</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for log in lifelog %}
-            <tr>
-                <th>{{ log.staDate }}</th>
-                <th>{{ log.endDate }}</th>
-                <th>{{ log.event }}</th>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>no lifelog posted</p>
-    {% endif %}
+    <div id='lifelog'>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>開始日時</th>
+                    <th>終了日時</th>
+                    <th>イベント</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for='record in lifelog' v-bind:key='record.staDate'>
+                    <th>| record.staDate |</th>
+                    <th>| record.endDate |</th>
+                    <th>| record.event |</th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
+
+{% block script %}
+    <script>
+        const app = new Vue({
+            delimiters: ["|","|"],
+            data: {
+                lifelog: JSON.parse('{{lifelog|safe}}')
+            },
+        });
+        app.$mount("#lifelog");
+    </script>
+{% endblock script %}
