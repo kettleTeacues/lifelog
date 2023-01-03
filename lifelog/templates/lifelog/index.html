@@ -7,22 +7,29 @@
     </div>
 
     <div id='lifelog'>
-        <table class="table">
+        <table class="table" v-if='lifelog.length'>
             <thead>
                 <tr>
+                    <th>id</th>
                     <th>開始日時</th>
                     <th>終了日時</th>
                     <th>イベント</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for='record in lifelog' v-bind:key='record.staDate'>
-                    <th>| record.staDate |</th>
-                    <th>| record.endDate |</th>
-                    <th>| record.event |</th>
-                </tr>
+                <template v-for='(record, i) in lifelog' v-bind:key='record.id'>
+                    <tr class='indexListRow' v-bind:value='i'>
+                        <th>| record.id |</th>
+                        <th><input type="text" class='indexListInput' v-model.lazy='record.staDate' disabled></th>
+                        <th><input type="text" class='indexListInput' v-model.lazy='record.endDate' disabled></th>
+                        <th><input type="text" class='indexListInput' v-model.lazy='record.event' disabled></th>
+                    </tr>
+                </template>
             </tbody>
         </table>
+        <span v-else>
+            no lifelog posted
+        </span>
     </div>
 {% endblock %}
 
@@ -31,9 +38,54 @@
         const app = new Vue({
             delimiters: ["|","|"],
             data: {
-                lifelog: JSON.parse('{{lifelog|safe}}')
+                lifelog: JSON.parse('{{lifelog|safe}}'),
+                clickedRow: {
+                    index: '',
+                    orgValue: '',
+                    element: ''
+                }
             },
+            methods: {
+            }
         });
         app.$mount("#lifelog");
+
+        document.body.onclick = function(event){
+            let row = event.target.closest('.indexListRow');
+
+            // 現在アクティブなrowを非アクティブにする
+            if(app.$data.clickedRow.element){
+                let disabledInputs = app.$data.clickedRow.element.querySelectorAll('input');
+                disabledInputs.forEach(function(el){
+                    el.setAttribute('disabled', true);
+                });
+                app.$data.clickedRow = {
+                    index: '',
+                    orgValue: '',
+                    element: ''
+                }
+            }
+
+            // rowがクリックされていないとき処理を抜ける
+            if(!row){
+                return;
+            }
+
+            // クリックされたrowをアクティブにする
+            let activeInputs = row.querySelectorAll('input');
+            activeInputs.forEach(function(el){
+                el.removeAttribute('disabled');
+            });
+
+            // クリックされたrowを保存する
+            let i = Number(row.getAttribute('value'));
+            app.$data.clickedRow = {
+                index: i,
+                orgValue: app.$data.lifelog[i].staDate
+                        + app.$data.lifelog[i].endDate
+                        + app.$data.lifelog[i].event,
+                element: row
+            }
+        }
     </script>
 {% endblock script %}

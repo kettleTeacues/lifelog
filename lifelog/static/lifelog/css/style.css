@@ -23,3 +23,13 @@ main{
 .contentMargin{
     margin-bottom: 100px;
 }
+
+.indexListInput:disabled{
+    color: black;
+    background: none;
+    border: none;
+}
+
+.indexListRow:hover{
+    background-color: aliceblue;
+}
