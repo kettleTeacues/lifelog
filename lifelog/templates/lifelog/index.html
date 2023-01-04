@@ -34,7 +34,7 @@
                 </tbody>
             </table>
             <span v-else>
-                no lifelog posted
+                |message|
             </span>
         </div>
     </div>
@@ -60,11 +60,12 @@
         const app = new Vue({
             delimiters: ["|","|"],
             data: {
-                lifelog: JSON.parse('{{lifelog|safe}}'),
+                lifelog: '',
                 activeRow: {
                     index: '',
                     element: ''
-                }
+                },
+                message: ''
             },
             methods: {
                 clickRow: function(event){
@@ -152,6 +153,28 @@
                         element: ''
                     }
                 },
+            },
+            mounted: async function(){
+                // 取得api
+                let isSucceed = await api.request({
+                    method: 'get',
+                    url: '/',
+                }).then(function(res){
+                    console.log(res)
+                    return res
+                }).catch(function(error){
+                    console.log(error)
+                    return false;
+                });
+                
+                if(isSucceed){
+                    this.lifelog = isSucceed.data
+                    console.log('{{userId}}')
+                    return;
+                } else {
+                    this.message = 'error'
+                    return;
+                }
             }
         });
         app.$mount("#lifelog");
