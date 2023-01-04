@@ -10,4 +10,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('control/', views.control, name='control'),
     path('api/', include(router.urls)),
+    path('apiv2/', Lifelog_api_views.LifelogListAPIView.as_view()),
 ]
