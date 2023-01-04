@@ -8,6 +8,8 @@
         </div>
 
         <div id='main'>
+            <a v-bind:href='preUrl' v-on:click.prevent='getList(preUrl)'>previous</a>
+            <a v-bind:href='nextUrl' v-on:click.prevent='getList(nextUrl)'>next</a>
             <table class="table" v-if='lifelog.length'>
                 <thead>
                     <tr>
@@ -49,7 +51,7 @@
 
         // APIクライアント
         const api = axios.create({
-            baseURL: "/api/",
+            baseURL: "/",
             timeout: 5000, 
             headers: {
                 "Content-Type": "application/json",
@@ -60,6 +62,8 @@
         const app = new Vue({
             delimiters: ["|","|"],
             data: {
+                preUrl: '',
+                nextUrl: '',
                 lifelog: '',
                 activeRow: {
                     index: '',
@@ -102,7 +106,7 @@
                     // 更新api
                     let isSucceed = await api.request({
                         method: 'put',
-                        url: this.lifelog[this.activeRow.index].id + '/',
+                        url: 'api/' + this.lifelog[this.activeRow.index].id + '/',
                         data: this.lifelog[this.activeRow.index]
                     }).then(function(res){
                         console.log(res)
@@ -153,12 +157,36 @@
                         element: ''
                     }
                 },
+                getList: async function(url){
+                    // 取得api
+                    let isSucceed = await api.request({
+                        method: 'get',
+                        url: url,
+                    }).then(function(res){
+                        console.log(res)
+                        return res
+                    }).catch(function(error){
+                        console.log(error)
+                        return false;
+                    });
+                    
+                    if(isSucceed){
+                        this.lifelog = isSucceed.data.results
+                        this.preUrl = isSucceed.data.previous
+                        this.nextUrl = isSucceed.data.next
+                        this.disableRow()
+                        return;
+                    } else {
+                        this.message = 'error'
+                        return;
+                    }
+                }
             },
             mounted: async function(){
                 // 取得api
                 let isSucceed = await api.request({
                     method: 'get',
-                    url: '/',
+                    url: 'list/',
                 }).then(function(res){
                     console.log(res)
                     return res
@@ -168,8 +196,9 @@
                 });
                 
                 if(isSucceed){
-                    this.lifelog = isSucceed.data
-                    console.log('{{userId}}')
+                    this.lifelog = isSucceed.data.results
+                    this.preUrl = isSucceed.data.previous
+                    this.nextUrl = isSucceed.data.next
                     return;
                 } else {
                     this.message = 'error'
