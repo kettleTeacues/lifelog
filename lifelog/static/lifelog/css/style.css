@@ -30,6 +30,10 @@ main{
     border: none;
 }
 
+.indexListButton:disabled{
+    display: none;
+}
+
 .indexListRow:hover{
     background-color: aliceblue;
 }

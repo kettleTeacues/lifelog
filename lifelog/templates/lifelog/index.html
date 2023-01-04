@@ -1,91 +1,159 @@
 {% extends 'base.html' %}
 
 {% block main %}
-    <div class="welcome">
-        <h1 class="title">ようこそlifelogへ！</h1>
-        <p class="subtitle">あなたの生活を記録しましょう</p>
-    </div>
-
     <div id='lifelog'>
-        <table class="table" v-if='lifelog.length'>
-            <thead>
-                <tr>
-                    <th>id</th>
-                    <th>開始日時</th>
-                    <th>終了日時</th>
-                    <th>イベント</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template v-for='(record, i) in lifelog' v-bind:key='record.id'>
-                    <tr class='indexListRow' v-bind:value='i'>
-                        <th>| record.id |</th>
-                        <th><input type="text" class='indexListInput' v-model.lazy='record.staDate' disabled></th>
-                        <th><input type="text" class='indexListInput' v-model.lazy='record.endDate' disabled></th>
-                        <th><input type="text" class='indexListInput' v-model.lazy='record.event' disabled></th>
+        <div class="welcome">
+            <h1 class="title">ようこそlifelogへ！</h1>
+            <p class="subtitle">あなたの生活を記録しましょう</p>
+        </div>
+
+        <div id='main'>
+            <table class="table" v-if='lifelog.length'>
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>開始日時</th>
+                        <th>終了日時</th>
+                        <th>イベント</th>
+                        <th></th>
+                        <th></th>
                     </tr>
-                </template>
-            </tbody>
-        </table>
-        <span v-else>
-            no lifelog posted
-        </span>
+                </thead>
+                <tbody>
+                    <template v-for='(record, i) in lifelog' v-bind:key='record.id'>
+                        <tr class='indexListRow' v-bind:value='i' v-on:click='clickRow'>
+                            <th>| record.id |</th>
+                            <th><input type="text" class='indexListInput' v-model.lazy='record.staDate' disabled></th>
+                            <th><input type="text" class='indexListInput' v-model.lazy='record.endDate' disabled></th>
+                            <th><input type="text" class='indexListInput' v-model.lazy='record.event' disabled></th>
+                            <th><input type="button" class='indexListButton' v-on:click.stop='saveRow' value="save" disabled></th>
+                            <th><input type="button" class='indexListButton' v-on:click.stop='cancelSaveRow' value="cancel" disabled></th>
+                            
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+            <span v-else>
+                no lifelog posted
+            </span>
+        </div>
     </div>
 {% endblock %}
 
 {% block script %}
+    <script src="https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
     <script>
+        // CSRFトークンの送信設定
+        axios.defaults.xsrfCookieName = "csrftoken";
+        axios.defaults.xsrfHeaderName = "X-CSRFToken";
+
+        // APIクライアント
+        const api = axios.create({
+            baseURL: "/api/",
+            timeout: 5000, 
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+
+        // vewインスタンスを作成
         const app = new Vue({
             delimiters: ["|","|"],
             data: {
                 lifelog: JSON.parse('{{lifelog|safe}}'),
-                clickedRow: {
+                activeRow: {
                     index: '',
-                    orgValue: '',
                     element: ''
                 }
             },
             methods: {
+                clickRow: function(event){
+                    console.log('clickRow')
+                    let clickedRow = event.target.closest('.indexListRow');
+                    let clickedIndex = Number(clickedRow.getAttribute('value'));
+        
+                    // 現在のacctiveRowを非アクティブにする
+                    if(this.activeRow.index != clickedIndex){
+                        this.disableRow()
+                    }
+        
+                    // clickedRowをアクティブにする
+                    let activeInputs = clickedRow.querySelectorAll('input');
+                    activeInputs.forEach(function(el){
+                        el.removeAttribute('disabled');
+                    });
+        
+                    // activeRowを保管する
+                    this.activeRow = {
+                        index: clickedIndex,
+                        element: clickedRow
+                    }
+        
+                    // currentValueがなければcurrentValueを保管する
+                    if(!Boolean('currentValue' in this.lifelog[clickedIndex])){
+                        console.log('currentValueを保管')
+                        this.lifelog[clickedIndex].currentValue = JSON.parse(JSON.stringify(this.lifelog[clickedIndex]))
+                    }
+                },
+                saveRow: async function(){
+                    console.log('saveRow')
+
+                    // 更新api
+                    let isSucceed = await api.request({
+                        method: 'put',
+                        url: this.lifelog[this.activeRow.index].id + '/',
+                        data: this.lifelog[this.activeRow.index]
+                    }).then(function(res){
+                        console.log(res)
+                        return true
+                    }).catch(function(error){
+                        console.log(error)
+                        return false;
+                    });
+                    
+                    // 更新後処理
+                    if(isSucceed){
+                        // currentValueを保管する
+                        let clickedIndex = this.activeRow.index
+                        this.lifelog[clickedIndex].currentValue = JSON.parse(JSON.stringify(this.lifelog[clickedIndex]))
+    
+                        this.disableRow()
+                        return;
+                    } else {
+                        return;
+                    }
+                },
+                cancelSaveRow: function(){
+                    console.log('cancelSaveRow')
+
+                    // currentValueを戻す
+                    this.lifelog[this.activeRow.index].staDate = this.lifelog[this.activeRow.index].currentValue.staDate
+                    this.lifelog[this.activeRow.index].endDate = this.lifelog[this.activeRow.index].currentValue.endDate
+                    this.lifelog[this.activeRow.index].event = this.lifelog[this.activeRow.index].currentValue.event
+                    this.disableRow()
+                },
+                disableRow: function(){
+                    console.log('disableRow')
+
+                    // activeRowがなければリターン
+                    if(!this.activeRow.element){
+                        return;
+                    }
+
+                    // input要素にdisableを付与
+                    let disabledInputs = this.activeRow.element.querySelectorAll('input');
+                    disabledInputs.forEach(function(el){
+                        el.setAttribute('disabled', true);
+                    });
+    
+                    // activeRowを初期化
+                    this.activeRow = {
+                        index: '',
+                        element: ''
+                    }
+                },
             }
         });
         app.$mount("#lifelog");
-
-        document.body.onclick = function(event){
-            let row = event.target.closest('.indexListRow');
-
-            // 現在アクティブなrowを非アクティブにする
-            if(app.$data.clickedRow.element){
-                let disabledInputs = app.$data.clickedRow.element.querySelectorAll('input');
-                disabledInputs.forEach(function(el){
-                    el.setAttribute('disabled', true);
-                });
-                app.$data.clickedRow = {
-                    index: '',
-                    orgValue: '',
-                    element: ''
-                }
-            }
-
-            // rowがクリックされていないとき処理を抜ける
-            if(!row){
-                return;
-            }
-
-            // クリックされたrowをアクティブにする
-            let activeInputs = row.querySelectorAll('input');
-            activeInputs.forEach(function(el){
-                el.removeAttribute('disabled');
-            });
-
-            // クリックされたrowを保存する
-            let i = Number(row.getAttribute('value'));
-            app.$data.clickedRow = {
-                index: i,
-                orgValue: app.$data.lifelog[i].staDate
-                        + app.$data.lifelog[i].endDate
-                        + app.$data.lifelog[i].event,
-                element: row
-            }
-        }
     </script>
 {% endblock script %}
