@@ -12,6 +12,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 # Application definition
 
+AUTH_USER_MODEL = 'accounts.customuser'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

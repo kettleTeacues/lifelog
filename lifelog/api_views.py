@@ -11,18 +11,18 @@ class LifelogViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = (
         'id',
-        'staDate',
+        'start_datetime',
     )
     ordering = (
-        'endDate'
+        'end_datetime'
     )
 
 class LifelogFilter(djangoFilters.FilterSet):
     class Meta:
         model = Lifelog
         fields = [
-            'staDate',
-            'endDate',
+            'start_datetime',
+            'end_datetime',
             'event'
         ]
 
@@ -38,5 +38,5 @@ class LifelogListAPIView(generics.ListAPIView):
     pagination_class = defaultPagination
 
     def get_queryset(self):
-        userId = self.request.user
-        return Lifelog.objects.order_by('-staDate').filter(created_by=userId)
+        userId = self.request.user.user_id
+        return Lifelog.objects.order_by('-start_datetime').filter(created_by=userId)

@@ -4,15 +4,12 @@ from django.contrib.auth.decorators import login_required
 import json
 
 from lifelog.models import Lifelog
-from lifelog.serializers import LifelogSerializer
 
 @login_required
 def index(request):
-    lifelog = Lifelog.objects.order_by('-staDate').filter(created_by=request.user.id)
-    serializer = LifelogSerializer(lifelog, many=True)
+    lifelog = Lifelog.objects.order_by('-start_datetime').filter(created_by=request.user.user_id)
 
-    context = {'lifelog': json.dumps(serializer.data, ensure_ascii=False)}
-    context = {'userId': request.user.id}
+    context = {'userId': request.user.user_id}
     return render(request, 'lifelog/index.html', context)
 
 @login_required
