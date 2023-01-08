@@ -8,6 +8,7 @@ class LifelogSerializer(serializers.ModelSerializer):
         
         # すべてのフィールドをシリアライズ
         fields = [
+            'id',
             'staDate',
             'endDate',
             'event',
