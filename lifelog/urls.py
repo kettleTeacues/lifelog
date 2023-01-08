@@ -8,5 +8,7 @@ router.register('', Lifelog_api_views.LifelogViewSet)
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('control/', views.control, name='control'),
     path('api/', include(router.urls)),
+    path('list/', Lifelog_api_views.LifelogListAPIView.as_view()),
 ]

@@ -19,3 +19,21 @@ main{
     padding: 1rem;
     margin-bottom: 1rem;
 }
+
+.contentMargin{
+    margin-bottom: 100px;
+}
+
+.indexListInput:disabled{
+    color: black;
+    background: none;
+    border: none;
+}
+
+.indexListButton:disabled{
+    display: none;
+}
+
+.indexListRow:hover{
+    background-color: aliceblue;
+}

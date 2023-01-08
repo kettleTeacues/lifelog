@@ -1,31 +1,211 @@
 {% extends 'base.html' %}
 
 {% block main %}
-    <div class="welcome">
-        <h1 class="title">ようこそlifelogへ！</h1>
-        <p class="subtitle">あなたの生活を記録しましょう</p>
-    </div>
+    <div id='lifelog'>
+        <div class="welcome">
+            <h1 class="title">ようこそlifelogへ！</h1>
+            <p class="subtitle">あなたの生活を記録しましょう</p>
+        </div>
 
-    {% if lifelog %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>開始日時</th>
-                <th>終了日時</th>
-                <th>イベント</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for log in lifelog %}
-            <tr>
-                <th>{{ log.staDate }}</th>
-                <th>{{ log.endDate }}</th>
-                <th>{{ log.event }}</th>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>no lifelog posted</p>
-    {% endif %}
+        <div id='main'>
+            <a v-bind:href='preUrl' v-on:click.prevent='getList(preUrl)'>previous</a>
+            <a v-bind:href='nextUrl' v-on:click.prevent='getList(nextUrl)'>next</a>
+            <table class="table" v-if='lifelog.length'>
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>開始日時</th>
+                        <th>終了日時</th>
+                        <th>イベント</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template v-for='(record, i) in lifelog' v-bind:key='record.id'>
+                        <tr class='indexListRow' v-bind:value='i' v-on:click='clickRow'>
+                            <th>| record.id |</th>
+                            <th><input type="text" class='indexListInput' v-model.lazy='record.staDate' disabled></th>
+                            <th><input type="text" class='indexListInput' v-model.lazy='record.endDate' disabled></th>
+                            <th><input type="text" class='indexListInput' v-model.lazy='record.event' disabled></th>
+                            <th><input type="button" class='indexListButton' v-on:click.stop='saveRow' value="save" disabled></th>
+                            <th><input type="button" class='indexListButton' v-on:click.stop='cancelSaveRow' value="cancel" disabled></th>
+                            
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+            <span v-else>
+                |message|
+            </span>
+        </div>
+    </div>
 {% endblock %}
+
+{% block script %}
+    <script src="https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
+    <script>
+        // CSRFトークンの送信設定
+        axios.defaults.xsrfCookieName = "csrftoken";
+        axios.defaults.xsrfHeaderName = "X-CSRFToken";
+
+        // APIクライアント
+        const api = axios.create({
+            baseURL: "/",
+            timeout: 5000, 
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+
+        // vewインスタンスを作成
+        const app = new Vue({
+            delimiters: ["|","|"],
+            data: {
+                preUrl: '',
+                nextUrl: '',
+                lifelog: '',
+                activeRow: {
+                    index: '',
+                    element: ''
+                },
+                message: ''
+            },
+            methods: {
+                clickRow: function(event){
+                    console.log('clickRow')
+                    let clickedRow = event.target.closest('.indexListRow');
+                    let clickedIndex = Number(clickedRow.getAttribute('value'));
+        
+                    // 現在のacctiveRowを非アクティブにする
+                    if(this.activeRow.index != clickedIndex){
+                        this.disableRow()
+                    }
+        
+                    // clickedRowをアクティブにする
+                    let activeInputs = clickedRow.querySelectorAll('input');
+                    activeInputs.forEach(function(el){
+                        el.removeAttribute('disabled');
+                    });
+        
+                    // activeRowを保管する
+                    this.activeRow = {
+                        index: clickedIndex,
+                        element: clickedRow
+                    }
+        
+                    // currentValueがなければcurrentValueを保管する
+                    if(!Boolean('currentValue' in this.lifelog[clickedIndex])){
+                        console.log('currentValueを保管')
+                        this.lifelog[clickedIndex].currentValue = JSON.parse(JSON.stringify(this.lifelog[clickedIndex]))
+                    }
+                },
+                saveRow: async function(){
+                    console.log('saveRow')
+
+                    // 更新api
+                    let isSucceed = await api.request({
+                        method: 'put',
+                        url: 'api/' + this.lifelog[this.activeRow.index].id + '/',
+                        data: this.lifelog[this.activeRow.index]
+                    }).then(function(res){
+                        console.log(res)
+                        return true
+                    }).catch(function(error){
+                        console.log(error)
+                        return false;
+                    });
+                    
+                    // 更新後処理
+                    if(isSucceed){
+                        // currentValueを保管する
+                        let clickedIndex = this.activeRow.index
+                        this.lifelog[clickedIndex].currentValue = JSON.parse(JSON.stringify(this.lifelog[clickedIndex]))
+    
+                        this.disableRow()
+                        return;
+                    } else {
+                        return;
+                    }
+                },
+                cancelSaveRow: function(){
+                    console.log('cancelSaveRow')
+
+                    // currentValueを戻す
+                    this.lifelog[this.activeRow.index].staDate = this.lifelog[this.activeRow.index].currentValue.staDate
+                    this.lifelog[this.activeRow.index].endDate = this.lifelog[this.activeRow.index].currentValue.endDate
+                    this.lifelog[this.activeRow.index].event = this.lifelog[this.activeRow.index].currentValue.event
+                    this.disableRow()
+                },
+                disableRow: function(){
+                    console.log('disableRow')
+
+                    // activeRowがなければリターン
+                    if(!this.activeRow.element){
+                        return;
+                    }
+
+                    // input要素にdisableを付与
+                    let disabledInputs = this.activeRow.element.querySelectorAll('input');
+                    disabledInputs.forEach(function(el){
+                        el.setAttribute('disabled', true);
+                    });
+    
+                    // activeRowを初期化
+                    this.activeRow = {
+                        index: '',
+                        element: ''
+                    }
+                },
+                getList: async function(url){
+                    // 取得api
+                    let isSucceed = await api.request({
+                        method: 'get',
+                        url: url,
+                    }).then(function(res){
+                        console.log(res)
+                        return res
+                    }).catch(function(error){
+                        console.log(error)
+                        return false;
+                    });
+                    
+                    if(isSucceed){
+                        this.lifelog = isSucceed.data.results
+                        this.preUrl = isSucceed.data.previous
+                        this.nextUrl = isSucceed.data.next
+                        this.disableRow()
+                        return;
+                    } else {
+                        this.message = 'error'
+                        return;
+                    }
+                }
+            },
+            mounted: async function(){
+                // 取得api
+                let isSucceed = await api.request({
+                    method: 'get',
+                    url: 'list/',
+                }).then(function(res){
+                    console.log(res)
+                    return res
+                }).catch(function(error){
+                    console.log(error)
+                    return false;
+                });
+                
+                if(isSucceed){
+                    this.lifelog = isSucceed.data.results
+                    this.preUrl = isSucceed.data.previous
+                    this.nextUrl = isSucceed.data.next
+                    return;
+                } else {
+                    this.message = 'error'
+                    return;
+                }
+            }
+        });
+        app.$mount("#lifelog");
+    </script>
+{% endblock script %}

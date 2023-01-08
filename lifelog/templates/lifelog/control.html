@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+    <div id='control'>
+        <div class='contentMargin'>
+            <img
+                v-bind:src='imgPath'
+                v-on:mouseleave='mouseLeaveImg'
+                v-on:mouseenter='mouseOnImg'
+                v-on:click='clickImg($event)'
+                v-on:error='welcomeImgError($event, "error occuerd.")'
+            >
+            <p>| msg.title |</p>
+            <p>| msg.content |</p>
+        </div>
+
+        <div class='contentMargin'>
+            <button v-on:click='getCurrentTime'>現在時刻を取得する。</button><br>
+            currentTime: <span>| currentTime |</span>
+        </div>
+        
+        <div class='contentMargin'>
+            <form>
+                <label for="name">
+                    氏名：
+                </label>
+                <input type="text" id='name'
+                    v-bind:value='myName'
+                    v-on:input='inputName($event)'
+                />
+            </form>
+            hello, |myName| ！
+        </div>
+
+        <div class='contentMargin'>
+            <form>
+                <label for="check">表示／非表示</label>
+                <input type="checkbox" v-model="h1IsShow"/>
+                <div id='panel' v-if='h1IsShow'>
+                    <h1>表示だあ！</h1>
+                </div>
+                <div id='panel' v-else>
+                    <h1>非表示ざんす！</h1>
+                </div>
+            </form>
+        </div>
+
+        <div class='contentMargin'>
+            <form>
+                <label for="holiday">祝日：</label><br>
+                <select id="holiday" v-model='holiday'>
+                    <option value="">祝日を選択してください。</option>
+                    <option value="new">元日</option>
+                    <option value="child">こどもの日</option>
+                    <option value="culture">文化の日</option>
+                    <option value="labor">勤労感謝の日</option>
+                </select>
+            </form>
+            <span v-if='holiday=="new"'>元日</span>
+            <span v-else-if='holiday=="child"'>こどもの日</span>
+            <span v-else-if='holiday=="culture"'>文化の日</span>
+            <span v-else-if='holiday=="labor"'>勤労感謝の日</span>
+            <span v-else>no selected</span>
+        </div>
+
+        <div class='contentMargin'>
+            <button v-on:click='deleteBook'>末尾の本を削除</button>
+            <ul>
+                <li v-for='(book,i) in books' v-bind:key='book.isbn'>
+                    <span>|i+1|</span>
+                    <span>|book.isbn|</span>
+                    <span>|book.title|</span>
+                    <span>|book.price|</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class='contentMargin'>
+            <span>高価な本</span>
+            <li v-for='(book,i) in expensiveBooks'>
+                <span>|i+1|</span>
+                <span>|book.isbn|</span>
+                <span>|book.title|</span>
+                <span>|book.price|</span>
+            </li>
+        </div>
+    </div>
+{% endblock main %}
+
+{% block script %}
+    <script>
+        const app = new Vue({
+            delimiters: ["|","|"],
+            data: {
+                msg:{
+                    title: 'hello!',
+                    content: 'you installed vew!'
+                },
+                books:[
+                    {
+                        isbn: 'abc',
+                        title: 'vew maste',
+                        price: 2900
+                    },
+                    {
+                        isbn: 'hsf',
+                        title: 'django maste',
+                        price: 1500
+                    },
+                    {
+                        isbn: 'pin',
+                        title: 'boot your linux',
+                        price: 2600
+                    }
+                ],
+                imgPath: '{% static 'lifelog/image/image1.jpg'%}',
+                currentTime: '',
+                myName: 'anonymous',
+                h1IsShow: true,
+                holiday: '',
+            },
+            computed: {
+                expensiveBooks: function(){
+                    return this.books.filter(function(book){
+                        return book.price >= 2000;
+                    })
+                }
+            },
+            methods: {
+                getCurrentTime: function(){
+                    this.currentTime = new Date().toLocaleString();
+                },
+                mouseLeaveImg: function(){
+                    this.imgPath = '{% static 'lifelog/image/image1.jpg'%}';
+                },
+                mouseOnImg: function(){
+                    this.imgPath = '{% static 'lifelog/image/image2.jpg'%}';
+                },
+                clickImg: function(event){
+                    this.imgPath = '{% static 'lifelog/image/image3.jpg'%}';
+                    console.log(event);
+                },
+                welcomeImgError: function(event, msg){
+                    this.imgPath = '{% static 'lifelog/image/noImage.jpg'%}';
+                    window.alert(msg);
+                },
+                inputName: function(event){
+                    this.myName = event.target.value;
+                },
+                deleteBook: function(index){
+                    this.books.shift();
+                }
+            }
+        });
+        app.$mount("#control")
+    </script>
+{% endblock script %}
