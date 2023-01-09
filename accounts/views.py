@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import render
 from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
@@ -5,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView
 from django.views.generic import CreateView
 
-from .models import customuser
+from .models import customuser, userActivateToken
 
 class customUserCreationForm(UserCreationForm):
     class Meta:
@@ -15,6 +16,24 @@ class customUserCreationForm(UserCreationForm):
             'password1',
             'password2'
         ]
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.is_active = False
+        user.email = self.cleaned_data['email']
+        user.save()
+
+        activateToken = userActivateToken()
+        activateToken.user_id = user
+        activateToken.save()
+
+        subject = "題名"
+        message = f'アクティベートリンク\nhttps://lifelog.piechika.com/accounts/activate/{activateToken.activate_token}/'
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [user.email]  # 宛先リスト
+        send_mail(subject, message, from_email, recipient_list)
+        
+        return user
+
 
 class customCreateView(CreateView):
     template_name = 'accounts/signup.html'
@@ -44,3 +63,9 @@ def mailtest(request):
     send_mail(subject, message, from_email, recipient_list)
     
     return HttpResponse("mailtest")
+
+def activateUser(request, activateToken):
+    print(activateToken)
+    targetUser = userActivateToken.objects.activateUser(activateToken)
+    print(targetUser)
+    return HttpResponse(f'アクティベートトークン：{activateToken}<br>ユーザーemail：{targetUser.email}')

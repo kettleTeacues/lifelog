@@ -1,10 +1,11 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
 # バリデーション用
 from django.core.validators import MinLengthValidator, RegexValidator
 
-import uuid
+import uuid, datetime
 
 class myUserManager(BaseUserManager):
     def create_user(self, email, password=None):
@@ -45,3 +46,22 @@ class customuser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+class userActivateTokenManager(models.Manager):
+    def activateUser(self, activate_token):
+        userActivateToken = self.filter(
+            activate_token = activate_token,
+        ).first()
+
+        if hasattr(userActivateToken, 'user_id'):
+            user = userActivateToken.user_id
+            user.is_active = True
+            user.save()
+            return user
+
+class userActivateToken(models.Model):
+    token_id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    activate_token = models.UUIDField(default=uuid.uuid4)
+
+    objects = userActivateTokenManager()
