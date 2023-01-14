@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name='Lifelog',
             old_name='end_datetime',
-            new_name='end_datetimetime'
+            new_name='end_datetime'
         ),
         migrations.RenameField(
             model_name='Lifelog',
