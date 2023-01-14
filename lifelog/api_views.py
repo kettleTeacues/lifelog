@@ -1,6 +1,8 @@
 from django_filters import rest_framework as djangoFilters
 from rest_framework import viewsets, filters, generics
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Lifelog
 from .serializers import LifelogSerializer
@@ -32,6 +34,8 @@ class defaultPagination(PageNumberPagination):
     max_page_size = 1000
 
 class LifelogListAPIView(generics.ListAPIView):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = LifelogSerializer
     filter_backends = [djangoFilters.DjangoFilterBackend]
     filterset_class = LifelogFilter

@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django_filters',
     'django_bootstrap5',
     'rest_framework',
+    'rest_framework.authtoken',
     'accounts',
     'lifelog',
 ]
@@ -126,3 +127,12 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSSES':[
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFALUT_PERMISSION_CLASSES':[
+        'rest_framework.permissions.IsAuthenticated'
+    ]
+}
