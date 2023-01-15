@@ -8,6 +8,8 @@ from .models import Lifelog
 from .serializers import LifelogSerializer
 
 class LifelogViewSet(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Lifelog.objects.all()
     serializer_class = LifelogSerializer
     filter_backends = (filters.OrderingFilter,)
