@@ -25,8 +25,8 @@
                     <template v-for='(record, i) in lifelog' v-bind:key='record.id'>
                         <tr class='indexListRow' v-bind:value='i' v-on:click='clickRow'>
                             <th>| record.id |</th>
-                            <th><input type="text" class='indexListInput' v-model.lazy='record.staDate' disabled></th>
-                            <th><input type="text" class='indexListInput' v-model.lazy='record.endDate' disabled></th>
+                            <th><input type="text" class='indexListInput' v-model.lazy='record.start_datetime' disabled></th>
+                            <th><input type="text" class='indexListInput' v-model.lazy='record.end_datetime' disabled></th>
                             <th><input type="text" class='indexListInput' v-model.lazy='record.event' disabled></th>
                             <th><input type="button" class='indexListButton' v-on:click.stop='saveRow' value="save" disabled></th>
                             <th><input type="button" class='indexListButton' v-on:click.stop='cancelSaveRow' value="cancel" disabled></th>
@@ -132,8 +132,8 @@
                     console.log('cancelSaveRow')
 
                     // currentValueを戻す
-                    this.lifelog[this.activeRow.index].staDate = this.lifelog[this.activeRow.index].currentValue.staDate
-                    this.lifelog[this.activeRow.index].endDate = this.lifelog[this.activeRow.index].currentValue.endDate
+                    this.lifelog[this.activeRow.index].start_datetime = this.lifelog[this.activeRow.index].currentValue.start_datetime
+                    this.lifelog[this.activeRow.index].end_datetime = this.lifelog[this.activeRow.index].currentValue.end_datetime
                     this.lifelog[this.activeRow.index].event = this.lifelog[this.activeRow.index].currentValue.event
                     this.disableRow()
                 },

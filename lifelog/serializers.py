@@ -9,12 +9,12 @@ class LifelogSerializer(serializers.ModelSerializer):
         # すべてのフィールドをシリアライズ
         fields = [
             'id',
-            'staDate',
-            'endDate',
+            'start_datetime',
+            'end_datetime',
             'event',
             'created_by',
             'created_at',
-            'update_at',
+            'updated_at',
             'isActive'
         ]
         read_only_fields = [
