@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
     name: 'calendar',
     data: () => ({
@@ -39,8 +40,30 @@ export default {
             },
         ],
     }),
-    mounted() {
+    mounted: async function(){
         this.$refs.calendar.scrollToTime('08:00')
+
+        // APIクライアント
+        const api = axios.create({
+            baseURL: "http://localhost:8000/",
+            timeout: 5000, 
+            headers: {
+                "Content-Type": "application/json",
+                'Autorization': '0d92b19837ef30dc0d9d850112e0b816e6888b28'
+            }
+        });
+
+        // 取得api
+        let isSucceed = await api.request({
+            method: 'get',
+            url: 'list/',
+        }).then(function(res){
+            console.log(res)
+            return res
+        }).catch(function(error){
+            console.log(error)
+            return false;
+        });
     },
 }
 </script>
