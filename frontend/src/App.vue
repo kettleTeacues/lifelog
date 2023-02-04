@@ -15,7 +15,6 @@
           </v-toolbar-title>
       </v-app-bar>
 
-
       <v-main>
           <week />
       </v-main>

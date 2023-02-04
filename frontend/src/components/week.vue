@@ -49,7 +49,7 @@ export default {
             timeout: 5000, 
             headers: {
                 "Content-Type": "application/json",
-                'Autorization': '0d92b19837ef30dc0d9d850112e0b816e6888b28'
+                'Authorization': process.env.VUE_APP_AUTH_TOKEN,
             }
         });
 
