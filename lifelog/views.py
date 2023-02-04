@@ -11,3 +11,6 @@ def index(request):
 @login_required
 def control(request):
     return render(request, 'lifelog/control.html')
+
+def component(request):
+    return render(request, 'lifelog/component.html')
