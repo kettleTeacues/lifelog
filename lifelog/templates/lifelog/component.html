@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+<div id='app'>
+    <div class='contentMargin'>
+        <p>コンポーネント基礎</p>
+        <my-hello user-name='kettle'/>
+    </div>
+
+    <div class='contentMargin'>
+        <p>コンポーネント間通信 emitイベント</p>
+        <p>現在値：|current|</p>
+        <my-counter step='1' v-on:plus-minus='onplus'></my-counter>
+        <my-counter step='2' v-on:plus-minus='onplus'></my-counter>
+        <my-counter step='-1' v-on:plus-minus='onplus'></my-counter>
+    </div>
+    
+    <div class='contentMargin'>
+        <p>コンポーネント間通信 provide/injectイベント</p>
+        <my-parent />
+    </div>
+    
+    <div class='contentMargin'>
+        <p>slot</p>
+        <my-no-prop>
+            <h5>top here</h5>
+            <template v-slot:header>
+                <h3>header here!</h3>
+            </template>
+            <template v-slot:name>
+                スズキ
+            </template>
+            <template v-slot:footer>
+                <h3>footer here!</h3>
+            </template>
+            「v-slot:スロット名」が明示されていない場合はcomponent.templateのスロット要素に集約される。
+            <h5>contact here</h5>
+            <br>
+            <template v-slot:change='slotProp'>
+                |slotProp.book.title| (|slotProp.book.price|円)
+            </template>
+        </my-no-prop>
+    </div>
+</div>
+{% endblock main %}
+
+{% block script %}
+<script>
+    // 親→子への伝達 props
+    const myHello = {
+        delimiters: ["|","|"],
+        props: {
+            userName:{
+                type: String,
+                required: true,
+                default: 'Anonymous',
+                validator(value){
+                    return value.length <= 10;
+                }
+            }
+        },
+        template: '<div>こんにちは|userName|</div>',
+        };
+    // 子→親への伝達 emits
+    // emits:イベントを発生させるための記述？
+    // 子コンポーネントでemitsを制御することで親コンポーネントでemitsイベントを監視できる。
+    const myCounter = {
+        delimiters: ["|","|"],
+        props: {
+            step:{
+                required: true,
+            }
+        },
+        emits: {
+            plusMinus(step){
+                if(step
+                && Number.isInteger(step)){
+                    return true;
+                } else {
+                    console.log('plusMinus event object must be integer.');
+                    return false;
+                }
+            }
+        },
+        template: `
+            <div>
+                <button type="button" v-on:click='onclick' value='add'>|step|</button>
+            </div>`,
+        methods: {
+            onclick(){
+                // 自作イベント「plusMinus」を発生させて第二引数を返却。
+                // グローバルコンポーネント（app）でplusminus(e)をリッスンしている。
+                this.$emit('plusMinus', Number(this.step));
+            }
+        }
+    }
+    const myParent = {
+        delimiters: ["|","|"],
+        data() {
+            return {
+                // オブジェクトの場合はリテラルの変更が勝手に
+                // 下位コンポーネントに伝搬する。（参照渡しのため）
+                parentTitle: {
+                    str: 'vue3入門'
+                },
+                str: {
+                    value:'文字です'
+                }
+            };
+        },
+        provide() {
+            return {
+                title : this.parentTitle,
+                str: this.str,
+                updateTitle: this.updateTitle
+            };
+        },
+        methods:{
+            updateTitle(){
+                this.str.value = '更新文字列'
+            }
+        },
+        template:`
+            <div id='parent'>
+                this is parentNode : |parentTitle.str|<br>
+                this is 文字リテラル : |str.value|
+                <input type='text' v-model='parentTitle.str' /><br><br>
+                <my-my />
+            </div>
+        `
+    }
+    const myMy = {
+        delimiters: ["|","|"],
+        inject: [
+            'title',
+            'str',
+            'updateTitle'
+        ],
+        template:`
+            <div id='my'>
+                this is myNode : |title.str|<br>
+                this is 文字リテラル : |str.value|<br>
+                <my-child />
+            </div>
+        `
+    }
+    const myChild = {
+        delimiters: ["|","|"],
+        inject: [
+            'title',
+            'str',
+            'updateTitle'
+        ],
+        template:`
+            <div id='child'>
+                this is childNode : |title.str|<br>
+                this is 文字リテラル : |str.value|<br>
+                <input type='button' value='update' v-on:click='updateTitle'/>
+            </div>
+        `
+    }
+    const noprop = {
+        delimiters: ["|","|"],
+        data(){
+            return {
+                compoBook:{
+                    isbn: '12345',
+                    title: 'book title',
+                    price: 1430,
+                    publish: '日経BP'
+                }
+            };
+        },
+        template: `
+            <slot name='header'></slot>
+            <div>
+                こんにちは<slot name='name'>ゲスト</slot>さん
+            </div>
+            <slot></slot>
+            <slot name='footer'></slot>
+            <slot name='change' v-bind:book='compoBook'>|compoBook.title| </slot>
+        `,
+    }
+    const app = Vue.createApp({
+        delimiters: ["|","|"],
+        data(){
+            return {
+                current: 0
+            }
+        },
+        methods: {
+            onplus: function(e){
+                if(Number.isInteger(e)){
+                    this.current += e;
+                }
+            }
+        },
+    });
+    app.component('my-hello', myHello);
+    app.component('my-counter', myCounter);
+    app.component('my-parent', myParent);
+    app.component('my-my', myMy);
+    app.component('my-child', myChild);
+    app.component('my-no-prop', noprop);
+    app.mount('#app');
+
+</script>
+{% endblock script %}
