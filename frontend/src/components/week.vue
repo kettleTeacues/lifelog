@@ -67,10 +67,10 @@ export default {
             });
 
             // 取得api
-            let response = await api.request({
-                method: 'get',
-                url: `week/?date=${date}`,
-            }).then(function(res){
+            let response = await axios.get(
+                `week/?date=${this.today}`,
+                Credential=true
+            ).then(function(res){
                 return res
             }).catch(function(error){
                 return false;
@@ -105,15 +105,19 @@ export default {
         this.$refs.calendar.scrollToTime('08:00')
 
         // todayを取得
+        // urlパラメータを整形
         let params = window.location.search;
         params = params.replace('?','');
         params = params.split('&');
+
+        // urlパラメータをobjに変換
         let paramsObj = {};
         params.forEach(param => {
             let arr =param.split('=');
             paramsObj[arr[0]] = arr[1];
         });
-        console.log(paramsObj);
+        
+        // urlパラメータのdateをtodayに代入
         if(paramsObj.date){
             this.today = paramsObj.date;
         } else {
@@ -121,21 +125,11 @@ export default {
             this.today = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
         }
 
-        // APIクライアント
-        let api = axios.create({
-            baseURL: "http://localhost:8000/",
-            timeout: 5000, 
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': process.env.VUE_APP_AUTH_TOKEN,
-            }
-        });
-
         // 取得api
-        let response = await api.request({
-            method: 'get',
-            url: `week/?date=${this.today}`,
-        }).then(function(res){
+        let response = await axios.get(
+            `week/?date=${this.today}`,
+            Credential=true
+        ).then(function(res){
             return res
         }).catch(function(error){
             return false;
