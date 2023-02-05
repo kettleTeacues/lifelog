@@ -47,6 +47,9 @@ class LifelogWeekApiView(generics.ListAPIView):
         date = datetime(int(urlDate[0]), int(urlDate[1]), int(urlDate[2]))
         staDate = date - timedelta(days=7)
         endDate = date + timedelta(days=7)
+        print(f'today  : {date}')
+        print(f'staDate: {staDate}')
+        print(f'endDate: {endDate}')
         return Lifelog.objects.order_by(
                 '-start_datetime'
             ).filter(

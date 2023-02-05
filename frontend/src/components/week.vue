@@ -56,15 +56,7 @@ export default {
     }),
     methods: {
         async getRecords(date){
-            // APIクライアント
-            let api = axios.create({
-                baseURL: "http://localhost:8000/",
-                timeout: 5000, 
-                headers: {
-                    "Content-Type": "application/json",
-                    'Authorization': process.env.VUE_APP_AUTH_TOKEN,
-                }
-            });
+            this.today = date;
 
             // 取得api
             let response = await axios.get(
@@ -77,7 +69,6 @@ export default {
             });
             console.log(response);
             if(response.status == 200){
-                this.today = date;
                 this.events = response.data;
                 window.history.replaceState('','',`?date=${date}`);
             } else {
