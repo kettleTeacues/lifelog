@@ -20,3 +20,22 @@ class LifelogSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'isActive'
         ]
+
+class LifelogWeekApiSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    start = serializers.DateTimeField(source='start_datetime', format='%Y-%m-%d %H:%M:%S')
+    end = serializers.DateTimeField(source='end_datetime', format='%Y-%m-%d %H:%M:%S')
+    event = serializers.CharField()
+    isActive = serializers.BooleanField()
+
+    class Meta:
+        model = Lifelog
+        isActive = serializers.ReadOnlyField(source='isActive')
+
+        fields = [
+            'id',
+            'start_datetime',
+            'end_datetime',
+            'event',
+            'isActive'
+        ]

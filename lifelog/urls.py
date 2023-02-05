@@ -13,5 +13,6 @@ urlpatterns = [
     path('component/', views.component, name='component'),
     path('api/', include(router.urls)),
     path('list/', Lifelog_api_views.LifelogListAPIView.as_view()),
+    path("week/", views.LifelogWeekApiView.as_view(), name="week"),
     path('apitoken/', drfAuthViews.obtain_auth_token, name='apitoken')
 ]

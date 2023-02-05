@@ -7,7 +7,7 @@
     >
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>Single-line item</v-list-item-title>
+          <v-list-item-title><a href="localhost:8000/">list</a></v-list-item-title>
         </v-list-item-content>
       </v-list-item>
   

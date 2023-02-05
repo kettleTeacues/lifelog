@@ -20,24 +20,8 @@ import axios from 'axios'
 export default {
     name: 'calendar',
     data: () => ({
-        today: '2019-01-08',
+        today: '2022-12-05',
         events: [
-            {
-                name: 'Weekly Meeting',
-                start: '2019-01-06 09:00',
-                end: '2019-01-07 10:00',
-            },
-            {
-                name: `Thomas' Birthday`,
-                start: '2019-01-07 08:00',
-                end: '2019-01-07 08:00',
-                color: 'red'
-            },
-            {
-                name: 'Mash Potatoes',
-                start: '2019-01-09 12:30',
-                end: '2019-01-09 15:30',
-            },
         ],
     }),
     mounted: async function(){
@@ -54,16 +38,26 @@ export default {
         });
 
         // 取得api
-        let isSucceed = await api.request({
+        let response = await api.request({
             method: 'get',
-            url: 'list/',
+            url: `week/?date=${this.today}`,
         }).then(function(res){
-            console.log(res)
             return res
         }).catch(function(error){
-            console.log(error)
             return false;
         });
+        console.log(response);
+        if(response.status == 200){
+            response.data.forEach(record => {
+                let sta = new Date(record.start_datetime)
+                let end = new Date(record.end_datetime)
+                this.events.push({
+                    name: record.event,
+                    start: record.start,
+                    end: record.end,
+                })
+            });
+        }
     },
 }
 </script>
