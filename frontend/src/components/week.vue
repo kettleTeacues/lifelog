@@ -1,7 +1,37 @@
 <template>
     <v-row>
         <v-col>
-            <v-sheet height="800">
+            <v-sheet height="700">
+                <v-btn
+                    outlined
+                    class="mr-4"
+                    color="grey darken-2"
+                    @click="setToday"
+                >
+                    Today
+                </v-btn>
+                <v-btn
+                    fab
+                    text
+                    small
+                    color="grey darken-2"
+                    @click="prev"
+                >
+                    <v-icon small>
+                    mdi-chevron-left
+                    </v-icon>
+                </v-btn>
+                <v-btn
+                    fab
+                    text
+                    small
+                    color="grey darken-2"
+                    @click="next"
+                >
+                    <v-icon small>
+                    mdi-chevron-right
+                    </v-icon>
+                </v-btn>
                 <v-calendar
                     ref="calendar"
                     :now="today" 
@@ -24,11 +54,75 @@ export default {
         events: [
         ],
     }),
+    methods: {
+        async getRecords(date){
+            // APIクライアント
+            let api = axios.create({
+                baseURL: "http://localhost:8000/",
+                timeout: 5000, 
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': process.env.VUE_APP_AUTH_TOKEN,
+                }
+            });
+
+            // 取得api
+            let response = await api.request({
+                method: 'get',
+                url: `week/?date=${date}`,
+            }).then(function(res){
+                return res
+            }).catch(function(error){
+                return false;
+            });
+            console.log(response);
+            if(response.status == 200){
+                this.today = date;
+                this.events = response.data;
+                window.history.replaceState('','',`?date=${date}`);
+            } else {
+                window.alert('サーバーエラーが発生しました。');
+            }
+        },
+        setToday(){
+            let today = new Date();
+            this.getRecords(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`);
+        },
+        prev(){
+            let prev = new Date(this.today);
+            prev.setDate(prev.getDate()-7);
+            let prevStr = `${prev.getFullYear()}-${prev.getMonth()+1}-${prev.getDate()}`;
+            this.getRecords(prevStr);
+        },
+        next(){
+            let next = new Date(this.today);
+            next.setDate(next.getDate()+7);
+            let nextStr = `${next.getFullYear()}-${next.getMonth()+1}-${next.getDate()}`;
+            this.getRecords(nextStr);
+        },
+    },
     mounted: async function(){
         this.$refs.calendar.scrollToTime('08:00')
 
+        // todayを取得
+        let params = window.location.search;
+        params = params.replace('?','');
+        params = params.split('&');
+        let paramsObj = {};
+        params.forEach(param => {
+            let arr =param.split('=');
+            paramsObj[arr[0]] = arr[1];
+        });
+        console.log(paramsObj);
+        if(paramsObj.date){
+            this.today = paramsObj.date;
+        } else {
+            let today = new Date();
+            this.today = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+        }
+
         // APIクライアント
-        const api = axios.create({
+        let api = axios.create({
             baseURL: "http://localhost:8000/",
             timeout: 5000, 
             headers: {
@@ -48,15 +142,9 @@ export default {
         });
         console.log(response);
         if(response.status == 200){
-            response.data.forEach(record => {
-                let sta = new Date(record.start_datetime)
-                let end = new Date(record.end_datetime)
-                this.events.push({
-                    name: record.event,
-                    start: record.start,
-                    end: record.end,
-                })
-            });
+            this.events = response.data
+        } else {
+            window.alert('サーバーエラーが発生しました。');
         }
     },
 }
@@ -84,5 +172,8 @@ export default {
     position: absolute;
     right: 4px;
     margin-right: 0px;
+}
+body::-webkit-scrollbar {
+  display: none;
 }
 </style>

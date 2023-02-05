@@ -25,7 +25,7 @@ class LifelogWeekApiSerializer(serializers.Serializer):
     id = serializers.CharField()
     start = serializers.DateTimeField(source='start_datetime', format='%Y-%m-%d %H:%M:%S')
     end = serializers.DateTimeField(source='end_datetime', format='%Y-%m-%d %H:%M:%S')
-    event = serializers.CharField()
+    name = serializers.CharField(source='event')
     isActive = serializers.BooleanField()
 
     class Meta:
