@@ -14,7 +14,7 @@ from .serializers import LifelogSerializer, LifelogWeekApiSerializer
 @login_required
 def index(request):
     context = {'userId': request.user.user_id}
-    return render(request, 'lifelog/index.html', context)
+    return render(request, 'index.html', context)
 
 @login_required
 def control(request):
@@ -32,6 +32,7 @@ class LifelogFilter(djangoFilters.FilterSet):
             'event'
         ]
 
+# api用
 class LifelogWeekApiView(generics.ListAPIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
