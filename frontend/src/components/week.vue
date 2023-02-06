@@ -139,11 +139,12 @@ export default {
             // urlパラメータのdateをtodayに代入
             if(paramsObj.date){
                 this.today = paramsObj.date;
+                this.debugDate = paramsObj.date;
             } else {
                 let today = new Date();
                 this.today = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+                this.debugDate = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
             }
-            this.debugDate = date;
 
             // 取得api
             let response = await axios.get(`week/?date=${this.today}`,{
