@@ -40,26 +40,22 @@
                     color="primary"
                     type="week"
                 ></v-calendar>
-                <div>
-                    <v-alert
-                        v-show="debugDate"
-                        border="right"
-                        color="blue-grey"
-                        dark
-                    >
-                        {{ debugDate }}
-                    </v-alert>
-                </div>
-                <div>
-                    <v-alert
-                        v-show="debugConsole"
-                        border="right"
-                        color="blue-grey"
-                        dark
-                    >
-                        {{ debugConsole }}
-                    </v-alert>
-                </div>
+                <v-alert
+                    v-show="debug"
+                    border="right"
+                    color="blue-grey"
+                    dark
+                >
+                    {{ debugDate }}
+                </v-alert>
+                <v-alert
+                    v-show="debug"
+                    border="right"
+                    color="blue-grey"
+                    dark
+                >
+                    {{ debugConsole }}
+                </v-alert>
             </v-sheet>
         </v-col>
     </v-row>
@@ -73,6 +69,7 @@ export default {
         today: '2999-12-31',
         events: [
         ],
+        debug: false,
         debugDate:'',
         debugConsole: ''
     }),
@@ -93,8 +90,8 @@ export default {
                 console.log(response);
                 if(response.status == 200){
                     this.events = response.data;
-                    window.history.replaceState('','',`?date=${date}`);
                     this.debugConsole = response;
+                    window.history.replaceState('','',`?date=${date}`);
                 }
             } catch(err){
                 this.debugConsole = err;
@@ -133,6 +130,11 @@ export default {
                 let arr =param.split('=');
                 paramsObj[arr[0]] = arr[1];
             });
+
+            // debug用の制御
+            if(paramsObj.debug){
+                this.debug = true;
+            }
             
             // urlパラメータのdateをtodayに代入
             if(paramsObj.date){
