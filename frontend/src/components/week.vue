@@ -40,6 +40,22 @@
                     color="primary"
                     type="week"
                 ></v-calendar>
+                <v-alert
+                    v-show="debug"
+                    border="right"
+                    color="blue-grey"
+                    dark
+                >
+                    {{ debugDate }}
+                </v-alert>
+                <v-alert
+                    v-show="debug"
+                    border="right"
+                    color="blue-grey"
+                    dark
+                >
+                    {{ debugConsole }}
+                </v-alert>
             </v-sheet>
         </v-col>
     </v-row>
@@ -50,29 +66,35 @@ import axios from 'axios'
 export default {
     name: 'calendar',
     data: () => ({
-        today: '2022-12-05',
+        today: '2999-12-31',
         events: [
         ],
+        debug: false,
+        debugDate:'',
+        debugConsole: ''
     }),
     methods: {
         async getRecords(date){
-            this.today = date;
+            try{
+                this.today = date;
+                this.debugDate = date;
 
-            // 取得api
-            let response = await axios.get(
-                `week/?date=${this.today}`,
-                Credential=true
-            ).then(function(res){
-                return res
-            }).catch(function(error){
-                return false;
-            });
-            console.log(response);
-            if(response.status == 200){
-                this.events = response.data;
-                window.history.replaceState('','',`?date=${date}`);
-            } else {
-                window.alert('サーバーエラーが発生しました。');
+                // 取得api
+                let response = await axios.get(`week/?date=${this.today}`,{
+                    'withCredentials':true
+                }).then(function(res){
+                    return res
+                }).catch(function(error){
+                    return false;
+                });
+                console.log(response);
+                if(response.status == 200){
+                    this.events = response.data;
+                    this.debugConsole = response;
+                    window.history.replaceState('','',`?date=${date}`);
+                }
+            } catch(err){
+                this.debugConsole = err;
             }
         },
         setToday(){
@@ -80,56 +102,64 @@ export default {
             this.getRecords(`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`);
         },
         prev(){
-            let prev = new Date(this.today);
+            let prev = new Date(this.today.replace(/-/g,"/"));
             prev.setDate(prev.getDate()-7);
             let prevStr = `${prev.getFullYear()}-${prev.getMonth()+1}-${prev.getDate()}`;
             this.getRecords(prevStr);
         },
         next(){
-            let next = new Date(this.today);
+            let next = new Date(this.today.replace(/-/g,"/"));
             next.setDate(next.getDate()+7);
             let nextStr = `${next.getFullYear()}-${next.getMonth()+1}-${next.getDate()}`;
             this.getRecords(nextStr);
         },
     },
     mounted: async function(){
-        this.$refs.calendar.scrollToTime('08:00')
+        try{
+            this.$refs.calendar.scrollToTime('08:00')
 
-        // todayを取得
-        // urlパラメータを整形
-        let params = window.location.search;
-        params = params.replace('?','');
-        params = params.split('&');
+            // todayを取得
+            // urlパラメータを整形
+            let params = window.location.search;
+            params = params.replace('?','');
+            params = params.split('&');
 
-        // urlパラメータをobjに変換
-        let paramsObj = {};
-        params.forEach(param => {
-            let arr =param.split('=');
-            paramsObj[arr[0]] = arr[1];
-        });
-        
-        // urlパラメータのdateをtodayに代入
-        if(paramsObj.date){
-            this.today = paramsObj.date;
-        } else {
-            let today = new Date();
-            this.today = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
-        }
+            // urlパラメータをobjに変換
+            let paramsObj = {};
+            params.forEach(param => {
+                let arr =param.split('=');
+                paramsObj[arr[0]] = arr[1];
+            });
 
-        // 取得api
-        let response = await axios.get(
-            `week/?date=${this.today}`,
-            Credential=true
-        ).then(function(res){
-            return res
-        }).catch(function(error){
-            return false;
-        });
-        console.log(response);
-        if(response.status == 200){
-            this.events = response.data
-        } else {
-            window.alert('サーバーエラーが発生しました。');
+            // debug用の制御
+            if(paramsObj.debug){
+                this.debug = true;
+            }
+            
+            // urlパラメータのdateをtodayに代入
+            if(paramsObj.date){
+                this.today = paramsObj.date;
+            } else {
+                let today = new Date();
+                this.today = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+            }
+            this.debugDate = date;
+
+            // 取得api
+            let response = await axios.get(`week/?date=${this.today}`,{
+                'withCredentials':true
+            }).then(function(res){
+                return res
+            }).catch(function(error){
+                return false;
+            });
+            console.log(response);
+            if(response.status == 200){
+                this.events = response.data
+                this.debugConsole = response;
+            }
+        } catch(err) {
+            this.debugConsole = err;
         }
     },
 }
