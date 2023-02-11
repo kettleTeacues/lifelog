@@ -54,7 +54,7 @@
                     @mousemove:time="mouseMove"
                     @mouseup:time="endDrag"
                     @mouseleave.native="cancelDrag">
-
+                    <!-- 
                     <template v-slot:event="{ event, timed, eventSummary }">
                         <div class="v-event-draggable">
                         <component :is="{ render: eventSummary }"></component>
@@ -65,6 +65,7 @@
                         @mousedown.stop="extendBottom(event)"
                         ></div>
                     </template>
+                     -->
                 </v-calendar>
                 <v-menu v-model="selectedOpen" :close-on-content-click="false" :activator="selectedElement" offset-x max-width="350px">
                     <v-card color="grey lighten-4" flat>
