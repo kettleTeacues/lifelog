@@ -4,7 +4,7 @@
         v-model="drawer"
         app
         >
-        <list />
+        <sidebar />
     </v-navigation-drawer>
     
     
@@ -16,23 +16,19 @@
     </v-app-bar>
     
     <v-main>
-        <week />
+        <router-view />
     </v-main>
 </v-app>
 </template>
 
 <script>
-import list from './components/list';
-import week from './components/week';
-import month from './components/month';
+import sidebar from './components/sidebar';
 
 export default {
     name: 'App',
     
     components: {
-        list,
-        week,
-        month,
+        sidebar,
     },
     data: () => ({
         drawer: '',
