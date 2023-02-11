@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
+import index from '../views/index.vue'
 import month from '../views/month.vue'
 import week from '../views/week.vue'
 import list from '../views/list.vue'
@@ -11,8 +12,8 @@ Vue.use(VueRouter)
 const routes = [
     {
         path: '/',
-        name: 'week',
-        component: week
+        name: 'index',
+        component: index
     },
     {
         path: '/month',
