@@ -67,7 +67,7 @@
                     </template>
                      -->
                 </v-calendar>
-                <v-menu v-model="selectedOpen" :close-on-content-click="false" :activator="selectedElement" offset-x max-width="350px">
+                <v-menu v-model="selectedOpen" :close-on-content-click="false" :activator="selectedElement" offset-x min-width="350px" max-width="350px">
                     <v-card color="grey lighten-4" flat>
                         <v-toolbar :color="selectedEvent.color" dark>
                             <!--
@@ -83,8 +83,13 @@
                             </v-btn>
                             -->
                         </v-toolbar>
+                        <v-card-subtitle>
+                            <span v-html="selectedEvent.startStr"></span> - 
+                            <span v-html="selectedEvent.endStr"></span>
+                        </v-card-subtitle>
                         <v-card-text>
-                            <span v-html="selectedEvent.details"></span>
+                            <div>detail</div>
+                            <span v-html="selectedEvent.detail"></span>
                         </v-card-text>
                         <v-card-actions>
                             <v-btn text color="secondary" @click="selectedOpen = false">
@@ -131,9 +136,10 @@
 </style>
 
 <script>
+import axios from 'axios'
 export default {
     data: () => ({
-        focus: '',
+        focus: '1970-01-01',
         type: 'week',
         typeToLabel: {
             month: 'Month',
@@ -144,8 +150,6 @@ export default {
         selectedElement: null,
         selectedOpen: false,
         events: [],
-        colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
-        names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
     }),
     mounted() {
         this.$refs.calendar.checkChange()
@@ -169,8 +173,10 @@ export default {
         },
         showEvent({ nativeEvent, event }) {
             const open = () => {
-                this.selectedEvent = event
+                this.selectedEvent = event;
                 this.selectedElement = nativeEvent.target
+                this.selectedEvent.startStr = this.formatDate(event.start, true);
+                this.selectedEvent.endStr = this.formatDate(event.end, true);
                 requestAnimationFrame(() => requestAnimationFrame(() => this.selectedOpen = true))
             }
 
@@ -264,36 +270,100 @@ export default {
         rndElement (arr) {
             return arr[this.rnd(0, arr.length - 1)]
         },
-        updateRange({ start, end }) {
-            const events = []
+        async updateRange() {
+            try{
+                let date = this.focus
+                this.debugDate = date;
 
-            const min = new Date(`${start.date}T00:00:00`)
-            const max = new Date(`${end.date}T23:59:59`)
-            const days = (max.getTime() - min.getTime()) / 86400000
-            const eventCount = this.rnd(days, days + 20)
-
-            for (let i = 0; i < eventCount; i++) {
-                const allDay = this.rnd(0, 3) === 0
-                const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-                const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-                const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-                const second = new Date(first.getTime() + secondTimestamp)
-
-                events.push({
-                    name: this.names[this.rnd(0, this.names.length - 1)],
-                    start: first,
-                    end: second,
-                    color: this.colors[this.rnd(0, this.colors.length - 1)],
-                    timed: !allDay,
-                    details:new Date()
-                })
+                // 取得api
+                let response = await axios.get(`getSpanApi/?date=${date}&span=${this.type}`,{
+                    'withCredentials':true
+                }).then(function(res){
+                    return res
+                }).catch(function(error){
+                    return false;
+                });
+                console.log(response);
+                if(response.status == 200){
+                    this.events = response.data.map(d=>{
+                        d.start = new Date(d.start);
+                        d.end = new Date(d.end);
+                        d.color = 'blue';
+                        d.timed = true;
+                        return d;
+                    });
+                    this.debugConsole = response;
+                    window.history.replaceState('','',`?date=${date}`);
+                }
+            } catch(err){
+                this.debugConsole = err;
             }
-
-            this.events = events
         },
         rnd(a, b) {
             return Math.floor((b - a + 1) * Math.random()) + a
         },
+        formatDate(date, includeTime){
+            let dateStr = `${date.getFullYear()}-${('00'+date.getMonth()+1).slice(-2)}-${('00'+date.getDate()).slice(-2)}`
+            let timeStr = `${('00'+date.getHours()).slice(-2)}:${('00'+date.getMinutes()).slice(-2)}`
+            if(includeTime){
+                return `${dateStr} ${timeStr}`;
+            } else {
+                return dateStr;
+            }
+        }
+    },
+    mounted: async function(){
+        try{
+            // todayを取得
+            // urlパラメータを整形
+            let params = window.location.search;
+            params = params.replace('?','');
+            params = params.split('&');
+
+            // urlパラメータをobjに変換
+            let paramsObj = {};
+            params.forEach(param => {
+                let arr =param.split('=');
+                paramsObj[arr[0]] = arr[1];
+            });
+
+            // debug用の制御
+            if(paramsObj.debug){
+                this.debug = true;
+            }
+            
+            // urlパラメータのdateをtodayに代入
+            if(paramsObj.date){
+                this.focus = paramsObj.date;
+                this.debugDate = paramsObj.date;
+            } else {
+                let today = new Date();
+                this.focus = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+                this.debugDate = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+            }
+
+            // 取得api
+            let response = await axios.get(`getSpanApi/?date=${this.focus}&span=${this.type}`,{
+                'withCredentials':true
+            }).then(function(res){
+                return res
+            }).catch(function(error){
+                return false;
+            });
+            console.log(response);
+            if(response.status == 200){
+                this.events = response.data.map(d=>{
+                    d.start = new Date(d.start);
+                    d.end = new Date(d.end);
+                    d.color = 'blue';
+                    d.timed = true;
+                    return d;
+                });
+                this.debugConsole = response;
+            }
+        } catch(err) {
+            this.debugConsole = err;
+        }
     },
 }
 </script>
