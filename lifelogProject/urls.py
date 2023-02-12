@@ -12,5 +12,4 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('admin/', admin.site.urls),
     re_path('^.*$', base_view)
-    
  ]
