@@ -55,7 +55,7 @@ def activateUser(request, activateToken):
     print(activateToken)
     targetUser = userActivateToken.objects.activateUser(activateToken)
     print(targetUser)
-    return HttpResponse(f'アクティベートトークン：{activateToken}<br>ユーザーemail：{targetUser.email}')
+    return HttpResponse(f'ユーザーをアクティベートしました。<br>ユーザーemail：{targetUser.email}')
 
 class customLoginView(LoginView):
     redirect_authenticated_user=True
