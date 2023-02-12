@@ -293,7 +293,7 @@ export default {
                 this.debugDate = date;
 
                 // 取得api
-                let response = await axios.get(`getSpanApi/?date=${date}&span=${this.type}`,{
+                let response = await axios.get(`spanApi/?date=${date}&span=${this.type}`,{
                     'withCredentials':true
                 }).then(function(res){
                     return res
@@ -364,7 +364,7 @@ export default {
             }
 
             // 取得api
-            let response = await axios.get(`getSpanApi/?date=${this.focus}&span=${this.type}`,{
+            let response = await axios.get(`spanApi/?date=${this.focus}&span=${this.type}`,{
                 'withCredentials':true
             }).then(function(res){
                 return res

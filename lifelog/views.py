@@ -2,26 +2,18 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django_filters import rest_framework as djangoFilters
 
-from rest_framework import viewsets, filters, generics
-from rest_framework.pagination import PageNumberPagination
+from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from datetime import datetime, timedelta
 
 from lifelog.models import Lifelog
-from .serializers import LifelogSerializer, LifelogWeekApiSerializer
+from .serializers import LifelogWeekApiSerializer
 
 @login_required
 def index(request):
     context = {'userId': request.user.user_id}
     return render(request, 'index.html', context)
-
-@login_required
-def control(request):
-    return render(request, 'lifelog/control.html')
-
-def component(request):
-    return render(request, 'lifelog/component.html')
 
 class LifelogFilter(djangoFilters.FilterSet):
     class Meta:
@@ -33,7 +25,7 @@ class LifelogFilter(djangoFilters.FilterSet):
         ]
 
 # api用
-class LifelogGetSpanApiView(generics.ListAPIView):
+class LifelogSpanApiView(generics.ListAPIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = LifelogWeekApiSerializer
