@@ -19,6 +19,22 @@
                 </v-list-item-title>
             </v-list-item-content>
         </v-list-item>
+        <v-divider></v-divider>
+        <v-list-item>
+            <v-list-item-content>
+                <v-list-item-title>
+                    <a href="/accounts/password" style="text-decoration: none;">account</a>
+                </v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
+        <v-list-item>
+            <v-list-item-content>
+                <v-list-item-title>
+                    <a href="/accounts/logout" style="text-decoration: none;">logout</a>
+                </v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
+        <v-divider></v-divider>
         <v-list-item>
             <v-list-item-content>
                 <v-list-item-title>

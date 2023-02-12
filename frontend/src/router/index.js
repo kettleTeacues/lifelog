@@ -2,8 +2,6 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import index from '../views/index.vue'
-import month from '../views/month.vue'
-import week from '../views/week.vue'
 import list from '../views/list.vue'
 import about from '../views/about.vue'
 
@@ -14,16 +12,6 @@ const routes = [
         path: '/',
         name: 'index',
         component: index
-    },
-    {
-        path: '/month',
-        name: 'month',
-        component: month
-    },
-    {
-        path: '/week',
-        name: 'week',
-        component: week
     },
     {
         path: '/list',
@@ -39,7 +27,7 @@ const routes = [
 
 const router = new VueRouter({
     mode: 'history',
-    base: process.env.BASE_URL,
+    base: '/',
     routes
 })
 
