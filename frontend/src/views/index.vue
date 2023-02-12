@@ -177,7 +177,6 @@ export default {
             return event.color
         },
         setToday() {
-            console.log(this.formatDate(new Date()))
             this.focus = this.formatDate(new Date());
         },
         prev() {
@@ -256,14 +255,14 @@ export default {
         },
         cancelDrag () {
             if (this.createEvent) {
-            if (this.extendOriginal) {
-                this.createEvent.end = this.extendOriginal
-            } else {
-                const i = this.events.indexOf(this.createEvent)
-                if (i !== -1) {
-                    this.events.splice(i, 1)
+                if (this.extendOriginal) {
+                    this.createEvent.end = this.extendOriginal
+                } else {
+                    const i = this.events.indexOf(this.createEvent)
+                    if (i !== -1) {
+                        this.events.splice(i, 1)
+                    }
                 }
-            }
             }
 
             this.createEvent = null
@@ -298,7 +297,6 @@ export default {
                 }).catch(function(error){
                     return false;
                 });
-                console.log(response);
                 if(response.status == 200){
                     this.events = response.data.map(d=>{
                         d.start = new Date(d.start);
@@ -369,7 +367,6 @@ export default {
             }).catch(function(error){
                 return false;
             });
-            console.log(response);
             if(response.status == 200){
                 this.events = response.data.map(d=>{
                     d.start = new Date(d.start);
