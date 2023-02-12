@@ -16,7 +16,7 @@ from django.contrib.auth.views import (
 
 from rest_framework.authtoken.models import Token as apiToken
 
-from .models import customuser, userActivateToken
+from .models import customuser, userActivateToken, sampleUser
 
 class customUserCreationForm(UserCreationForm):
     class Meta:
@@ -60,6 +60,11 @@ def activateUser(request, activateToken):
 class customLoginView(LoginView):
     redirect_authenticated_user=True
     template_name='accounts/login.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['sampleUser'] = sampleUser.objects.all().first()
+        print(context)
+        return context
 
 class customPasswordChangeView(PasswordChangeView):
     redirect_authenticated_user=True

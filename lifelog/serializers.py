@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Lifelog
+from .models import Lifelog, about
 
 class LifelogSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,4 +38,12 @@ class LifelogWeekApiSerializer(serializers.Serializer):
             'end_datetime',
             'event',
             'isActive'
+        ]
+
+class aboutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = about
+        html = serializers.ReadOnlyField(source='html')
+        fields = [
+            'html'
         ]

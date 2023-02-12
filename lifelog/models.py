@@ -31,3 +31,6 @@ class Lifelog(models.Model):
 
     def __str__(self):
         return str(self.created_by)+' '+self.event+' '+format(self.start_datetime, '%Y-%m-%d %H-%M-%S')
+
+class about(models.Model):
+    html = models.TextField()

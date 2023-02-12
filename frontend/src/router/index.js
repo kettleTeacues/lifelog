@@ -1,21 +1,34 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import indexView from '../App.vue'
+
+import index from '../views/index.vue'
+import list from '../views/list.vue'
+import about from '../views/about.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/',
-    name: 'index',
-    component: indexView
-  },
+    {
+        path: '/',
+        name: 'index',
+        component: index
+    },
+    {
+        path: '/list',
+        name: 'list',
+        component: list
+    },
+    {
+        path: '/about',
+        name: 'about',
+        component: about
+    },
 ]
 
 const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+    mode: 'history',
+    base: '/',
+    routes
 })
 
 export default router

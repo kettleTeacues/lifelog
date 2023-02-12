@@ -4,35 +4,31 @@
         v-model="drawer"
         app
         >
-        <list />
+        <sidebar />
     </v-navigation-drawer>
     
     
     <v-app-bar app>
         <v-app-bar-nav-icon v-on:click="drawer = !drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>
-            Lifelog
+           <a href="/" style="text-decoration: none; color: rgba(0, 0, 0, 0.87);">Lifelog</a>
         </v-toolbar-title>
     </v-app-bar>
     
     <v-main>
-        <week />
+        <router-view />
     </v-main>
 </v-app>
 </template>
 
 <script>
-import list from './components/list';
-import week from './components/week';
-import month from './components/month';
+import sidebar from './components/sidebar';
 
 export default {
     name: 'App',
     
     components: {
-        list,
-        week,
-        month,
+        sidebar,
     },
     data: () => ({
         drawer: '',
