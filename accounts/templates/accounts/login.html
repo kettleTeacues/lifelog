@@ -10,4 +10,33 @@
         {% bootstrap_button button_type='submit' content='ログイン' %}
     </form>
     <a href="{% url 'password_reset' %}">パスワードを忘れた？</a>
+
+    <div style='margin-top:30px'>
+        <h3>サンプルユーザー</h3>
+        <table>
+            {% if sampleUser.email %}
+            <tr>
+                <td>Email</td>
+                <td style='width:20px; text-align:center;'>|</td>
+                <td>{{ sampleUser.email }}</td>
+            </tr>
+            <tr>
+                <td>パスワード</td>
+                <td style='width:20px; text-align:center;'>|</td>
+                <td>{{ sampleUser.password }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td>Email</td>
+                <td style='width:20px; text-align:center;'>|</td>
+                <td>サンプルユーザーを取得できませんでした。</td>
+            </tr>
+            <tr>
+                <td>パスワード</td>
+                <td style='width:20px; text-align:center;'>|</td>
+                <td>サンプルユーザーを取得できませんでした。</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
 {% endblock main %}

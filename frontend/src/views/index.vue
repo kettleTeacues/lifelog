@@ -48,12 +48,7 @@
                     @click:event="showEvent"
                     @click:more="viewDay"
                     @click:date="viewDay"
-                    @change="updateRange"
-                    @mousedown:event="startDrag"
-                    @mousedown:time="startTime"
-                    @mousemove:time="mouseMove"
-                    @mouseup:time="endDrag"
-                    @mouseleave.native="cancelDrag">
+                    @change="updateRange">
                     <!-- 
                     <template v-slot:event="{ event, timed, eventSummary }">
                         <div class="v-event-draggable">
@@ -166,6 +161,9 @@ export default {
         selectedElement: null,
         selectedOpen: false,
         events: [],
+        debug: false,
+        debugDate:'',
+        debugConsole: ''
     }),
     mounted() {
         this.$refs.calendar.checkChange()

@@ -13,4 +13,5 @@ urlpatterns = [
     path('listApi/', Lifelog_api_views.LifelogListAPIView.as_view(), name='listApi'),
     path('spanApi/', views.LifelogSpanApiView.as_view(), name='spanApi'),
     path('apitoken/', drfAuthViews.obtain_auth_token, name='apitoken'),
+    path('aboutHtml', views.aboutApiView.as_view(), name='aboutHtml')
 ]

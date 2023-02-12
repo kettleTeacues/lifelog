@@ -65,3 +65,7 @@ class userActivateToken(models.Model):
     activate_token = models.UUIDField(default=uuid.uuid4)
 
     objects = userActivateTokenManager()
+
+class sampleUser(models.Model):
+    email = models.EmailField(unique=True, null=False)
+    password = models.CharField(blank=True, null=True, max_length=100)
