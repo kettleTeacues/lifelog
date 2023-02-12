@@ -98,6 +98,22 @@
                         </v-card-actions>
                     </v-card>
                 </v-menu>
+                <v-alert
+                    v-show="debug"
+                    border="right"
+                    color="blue-grey"
+                    dark
+                >
+                    {{ debugDate }}
+                </v-alert>
+                <v-alert
+                    v-show="debug"
+                    border="right"
+                    color="blue-grey"
+                    dark
+                >
+                    {{ debugConsole }}
+                </v-alert>
             </v-sheet>
         </v-col>
     </v-row>
@@ -163,7 +179,8 @@ export default {
             return event.color
         },
         setToday() {
-            this.focus = ''
+            console.log(this.formatDate(new Date()))
+            this.focus = this.formatDate(new Date());
         },
         prev() {
             this.$refs.calendar.prev()
@@ -303,7 +320,7 @@ export default {
             return Math.floor((b - a + 1) * Math.random()) + a
         },
         formatDate(date, includeTime){
-            let dateStr = `${date.getFullYear()}-${('00'+date.getMonth()+1).slice(-2)}-${('00'+date.getDate()).slice(-2)}`
+            let dateStr = `${date.getFullYear()}-${('00'+(date.getMonth()+1)).slice(-2)}-${('00'+date.getDate()).slice(-2)}`
             let timeStr = `${('00'+date.getHours()).slice(-2)}:${('00'+date.getMinutes()).slice(-2)}`
             if(includeTime){
                 return `${dateStr} ${timeStr}`;
@@ -332,14 +349,18 @@ export default {
                 this.debug = true;
             }
             
-            // urlパラメータのdateをtodayに代入
+            // urlパラメータのdateをfocusに代入
             if(paramsObj.date){
                 this.focus = paramsObj.date;
                 this.debugDate = paramsObj.date;
             } else {
-                let today = new Date();
-                this.focus = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
-                this.debugDate = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+                this.focus = this.formatDate(new Date);
+                this.debugDate = this.formatDate(new Date);
+            }
+
+            // urlパラメータのspanをtypeに代入
+            if(paramsObj.span){
+                this.type = paramsObj.span;
             }
 
             // 取得api
