@@ -1,14 +1,15 @@
+import pytz
+
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django_filters import rest_framework as djangoFilters
-
 from rest_framework import generics, viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from datetime import datetime, timedelta
 
 from lifelog.models import Lifelog, about
-from .serializers import LifelogWeekApiSerializer, aboutSerializer
+from .serializers import LifelogSpanApiSerializer, aboutSerializer
 
 @login_required
 def index(request):
@@ -28,7 +29,7 @@ class LifelogFilter(djangoFilters.FilterSet):
 class LifelogSpanApiView(generics.ListAPIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = LifelogWeekApiSerializer
+    serializer_class = LifelogSpanApiSerializer
     filter_backends = [djangoFilters.DjangoFilterBackend]
     filterset_class = LifelogFilter
 
@@ -37,7 +38,7 @@ class LifelogSpanApiView(generics.ListAPIView):
         urlDate = self.request.query_params.get('date').split('-')
         urlCalendarSpan = self.request.query_params.get('span')
 
-        date = datetime(int(urlDate[0]), int(urlDate[1]), int(urlDate[2]))
+        date = datetime(int(urlDate[0]), int(urlDate[1]), int(urlDate[2]), tzinfo=pytz.timezone('Asia/Tokyo'))
         staDate = date - timedelta(days=7)
         endDate = date + timedelta(days=7)
         if urlCalendarSpan == 'month':

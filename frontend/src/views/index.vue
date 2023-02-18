@@ -301,7 +301,9 @@ export default {
                     this.events = response.data.map(d=>{
                         d.start = new Date(d.start);
                         d.end = new Date(d.end);
-                        d.color = 'blue';
+                        if(!d.color){
+                            d.color = 'blue';
+                        }
                         d.timed = true;
                         return d;
                     });
@@ -371,7 +373,9 @@ export default {
                 this.events = response.data.map(d=>{
                     d.start = new Date(d.start);
                     d.end = new Date(d.end);
-                    d.color = 'blue';
+                    if(!d.color){
+                        d.color = 'blue';
+                    }
                     d.timed = true;
                     return d;
                 });

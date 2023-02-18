@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from .models import Lifelog, about
+
+from . import models
 
 class LifelogSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Lifelog
+        model = models.Lifelog
         isActive = serializers.ReadOnlyField(source='isActive')
         
         # すべてのフィールドをシリアライズ
@@ -21,15 +22,16 @@ class LifelogSerializer(serializers.ModelSerializer):
             'isActive'
         ]
 
-class LifelogWeekApiSerializer(serializers.Serializer):
+class LifelogSpanApiSerializer(serializers.Serializer):
     id = serializers.CharField()
     start = serializers.DateTimeField(source='start_datetime', format='%Y-%m-%d %H:%M:%S')
     end = serializers.DateTimeField(source='end_datetime', format='%Y-%m-%d %H:%M:%S')
     name = serializers.CharField(source='event')
-    isActive = serializers.BooleanField()
+    detail = serializers.CharField()
+    color = serializers.CharField()
 
     class Meta:
-        model = Lifelog
+        model = models.Lifelog
         isActive = serializers.ReadOnlyField(source='isActive')
 
         fields = [
@@ -37,12 +39,29 @@ class LifelogWeekApiSerializer(serializers.Serializer):
             'start_datetime',
             'end_datetime',
             'event',
-            'isActive'
+            'detail',
+            'color'
+        ]
+
+class tagApiSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.tag
+
+        exclude = [
+            'created_by'
+        ]
+
+class memoApiSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.memo
+
+        exclude = [
+            'created_by'
         ]
 
 class aboutSerializer(serializers.ModelSerializer):
     class Meta:
-        model = about
+        model = models.about
         html = serializers.ReadOnlyField(source='html')
         fields = [
             'html'
